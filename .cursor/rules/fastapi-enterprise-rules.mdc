@@ -1,0 +1,69 @@
+---
+description:## FastAPI Enterprise Template – Developer Rules
+
+- **Python Version:**
+  All code must target Python 3.12 or higher.
+  _Enforced in pyproject.toml, Dockerfiles, CI, and all scripts._
+
+- **Dependency Management:**
+  Use only Poetry (`pyproject.toml`) for dependencies.
+  Do **not** use requirements.txt.
+  All libraries and tools must be compatible with Python 3.12+.
+
+- **Core Libraries:**
+  Use FastAPI, Uvicorn, Pydantic v2+, SQLAlchemy 2.0+, asyncpg only.
+
+- **Dev Tooling:**
+  - Lint/format: Black, Ruff, isort
+  - Type checks: mypy
+  - Testing: pytest, pytest-cov, pytest-asyncio
+  - Security: Bandit
+  - Docs: mkdocs
+  - DB Migrations: Alembic
+  - Pre-commit required for all contributors
+
+- **Async Everywhere:**
+  Use `async/await` for all endpoints, database interactions, and external API calls where possible.
+
+- **Type Hints:**
+  All functions and methods must have explicit type annotations (inputs and return types).
+
+- **Testing & Coverage:**
+  Every new feature or bugfix requires tests.
+  Minimum test coverage: **90%** (pytest + coverage).
+  Use `pytest-asyncio` for async tests.
+
+- **Documentation:**
+  Update mkdocs documentation with every feature or change.
+  API documentation auto-generated via FastAPI.
+
+- **Docker:**
+  Use `python:3.12-slim` as the base image in all Dockerfiles.
+# cursor:rule
+
+## Documentation Rule
+
+- Any significant code, feature, or process change must be **reflected in both `CONTRIBUTING.md` and `README.md`**.
+- Always review and update these files to keep onboarding, usage, and contribution instructions clear and current.
+
+> If you add a new process, tool, or guideline, make sure it's described in both files as appropriate.
+
+
+- **Contribution:**
+  Use provided GitHub issue and PR templates.
+  Pre-commit hooks must pass before every commit/PR.
+
+---
+
+**Checklist for All Contributions:**
+- [ ] Uses Python 3.12+ features
+- [ ] Only Poetry for dependencies
+- [ ] Code is async & type-annotated
+- [ ] Pre-commit hooks ran and passed
+- [ ] >90% test coverage (pytest/pytest-asyncio)
+- [ ] Docs updated (mkdocs/Swagger)
+
+---
+globs:
+alwaysApply: true
+---
