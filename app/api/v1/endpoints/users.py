@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from structlog import get_logger
 
+from app.crud.postal_code import postal_code
 from app.crud.user import user
 from app.db.base import get_db
 from app.models.user import User
@@ -19,6 +20,9 @@ class UserBase(BaseModel):
     email: str
     full_name: str | None = None
     is_active: bool = True
+    address: str | None = None
+    age: int | None = None
+    postal_code_id: int | None = None
 
 
 class UserCreate(UserBase):
@@ -77,12 +81,24 @@ async def create_user(user_in: UserCreate, db: AsyncSession = Depends(get_db)) -
             detail="User with this email already exists",
         )
 
+    # Validate postal code if provided
+    if user_in.postal_code_id is not None:
+        db_postal_code = await postal_code.get(db, id=user_in.postal_code_id)
+        if not db_postal_code:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid postal code ID",
+            )
+
     # Create user data dict
     user_data = {
         "email": user_in.email,
         "password": user_in.password,
         "full_name": user_in.full_name,
         "is_active": user_in.is_active,
+        "address": user_in.address,
+        "age": user_in.age,
+        "postal_code_id": user_in.postal_code_id,
     }
 
     db_user = await user.create(db, obj_in=user_data)
@@ -112,6 +128,15 @@ async def update_user(
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="User with this email already exists",
+            )
+
+    # Validate postal code if provided
+    if user_in.postal_code_id is not None:
+        db_postal_code = await postal_code.get(db, id=user_in.postal_code_id)
+        if not db_postal_code:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid postal code ID",
             )
 
     user_data = user_in.model_dump(exclude_unset=True)

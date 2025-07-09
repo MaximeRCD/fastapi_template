@@ -39,6 +39,9 @@ class CRUDUser:
             full_name=obj_in.get("full_name"),
             is_active=obj_in.get("is_active", True),
             is_superuser=obj_in.get("is_superuser", False),
+            address=obj_in.get("address"),
+            age=obj_in.get("age"),
+            postal_code_id=obj_in.get("postal_code_id"),
         )
         db.add(db_obj)
         await db.commit()
