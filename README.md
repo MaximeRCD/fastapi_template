@@ -33,7 +33,7 @@ This project provides a **modern and reliable FastAPI foundation**, fully levera
 * **Modern configuration**: dotenv + Pydantic v2+.
 * **Security**: Bandit, dependency checks.
 * **Makefile** utilities.
-* **Docker & Docker Compose**: Production and development-ready.
+* **Docker & Docker Compose**: Production and development-ready with live reloading.
 
 ---
 
@@ -45,12 +45,15 @@ fastapi-enterprise-template/
 ├── app/
 │   ├── api/
 │   ├── core/
+│   ├── crud/
 │   ├── db/
 │   ├── models/
 │   ├── services/
 │   ├── utils/
 │   └── main.py
 ├── tests/
+├── scripts/
+├── migrations/
 ├── .github/
 │   └── workflows/
 ├── .env.example
@@ -62,7 +65,6 @@ fastapi-enterprise-template/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── alembic.ini
-├── migrations/
 └── LICENSE
 ```
 
@@ -86,6 +88,8 @@ fastapi-enterprise-template/
 
 ## Installation & Quickstart
 
+### Local Development
+
 ```bash
 # Clone the repo and set up Python 3.12+
 git clone https://github.com/your-org/fastapi-enterprise-template.git
@@ -101,6 +105,65 @@ cp .env.example .env
 make run
 
 # Access API docs: http://localhost:8000/docs
+```
+
+### Docker Development (Recommended)
+
+```bash
+# Clone the repo
+git clone https://github.com/your-org/fastapi-enterprise-template.git
+cd fastapi-enterprise-template
+
+# Start the development environment with live reloading
+make docker-dev
+
+# Or run in background
+make docker-run
+
+# View logs
+make docker-logs
+
+# Access API docs: http://localhost:8000/docs
+```
+
+#### Docker Development Features
+
+* **Live code reloading**: Changes to your code automatically restart the server
+* **Real PostgreSQL database**: No more mock data, full database integration
+* **Isolated environment**: Consistent development environment across team members
+* **Health checks**: Automatic monitoring of services
+* **Easy database access**: `make docker-db-shell` to connect to PostgreSQL
+
+#### Docker Commands
+
+```bash
+# Development with logs
+make docker-dev
+
+# Run in background
+make docker-run
+
+# Stop services
+make docker-stop
+
+# View logs
+make docker-logs
+make docker-logs-app
+make docker-logs-db
+
+# Access container shells
+make docker-shell
+make docker-db-shell
+
+# Database operations
+make docker-migrate
+make docker-db-init
+
+# Run tests in container
+make docker-test
+
+# Clean up everything
+make docker-clean
 ```
 
 ---
@@ -119,6 +182,50 @@ make typecheck
 # Run tests
 make test
 ```
+
+---
+
+## Database Operations
+
+### Local Development
+
+```bash
+# Initialize database tables
+make db-init
+
+# Run migrations
+make migrate
+
+# Create new migration
+make migrate-create name=add_new_field
+```
+
+### Docker Development
+
+```bash
+# Initialize database in Docker
+make docker-db-init
+
+# Run migrations in Docker
+make docker-migrate
+
+# Create new migration in Docker
+make docker-migrate-create name=add_new_field
+```
+
+---
+
+## API Endpoints
+
+The application includes a complete User management system with real database integration:
+
+* `GET /api/v1/users/` - List all users
+* `GET /api/v1/users/{user_id}` - Get specific user
+* `POST /api/v1/users/` - Create new user
+* `PUT /api/v1/users/{user_id}` - Update user
+* `DELETE /api/v1/users/{user_id}` - Delete user
+
+All endpoints use real PostgreSQL database operations with proper error handling and validation.
 
 ---
 
@@ -156,6 +263,7 @@ make test
 * **Enforce code reviews, aim for >90% test coverage.**
 * **Require docs and tests for every feature.**
 * **Deploy only on Python 3.12 environments (recommended Docker base: `python:3.12-slim`).**
+* **Use Docker for development** to ensure consistent environments across team members.
 
 ---
 

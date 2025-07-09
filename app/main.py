@@ -11,6 +11,7 @@ from structlog import get_logger
 from app.api.v1.api import api_router
 from app.core.config import settings
 from app.core.logging import setup_logging
+from app.db.base import init_db
 
 logger = get_logger(__name__)
 
@@ -21,6 +22,14 @@ async def lifespan(app: FastAPI) -> Any:
     # Startup
     logger.info("Starting FastAPI Enterprise Template application")
     setup_logging()
+
+    # Initialize database
+    try:
+        await init_db()
+        logger.info("Database initialized successfully")
+    except Exception as e:
+        logger.error("Failed to initialize database", error=str(e))
+        raise
 
     yield
 

@@ -55,11 +55,15 @@ clean: ## Clean up generated files
 	find . -type d -name "*.egg-info" -exec rm -rf {} +
 	rm -rf .coverage htmlcov .pytest_cache .mypy_cache
 
+# Docker Development Commands
 docker-build: ## Build Docker image
 	docker build -t fastapi-enterprise-template .
 
 docker-run: ## Run with Docker Compose
 	docker-compose up -d
+
+docker-dev: ## Run with Docker Compose in development mode (with logs)
+	docker-compose up
 
 docker-stop: ## Stop Docker Compose services
 	docker-compose down
@@ -67,17 +71,54 @@ docker-stop: ## Stop Docker Compose services
 docker-logs: ## View Docker Compose logs
 	docker-compose logs -f
 
-docs: ## Build documentation
-	poetry run mkdocs build
+docker-logs-app: ## View only app logs
+	docker-compose logs -f app
 
-serve-docs: ## Serve documentation locally
-	poetry run mkdocs serve
+docker-logs-db: ## View only database logs
+	docker-compose logs -f db
 
+docker-restart: ## Restart Docker Compose services
+	docker-compose restart
+
+docker-clean: ## Stop and remove all containers, networks, and volumes
+	docker-compose down -v --remove-orphans
+
+docker-shell: ## Access app container shell
+	docker-compose exec app bash
+
+docker-db-shell: ## Access database container shell
+	docker-compose exec db psql -U postgres -d fastapi_enterprise
+
+docker-migrate: ## Run migrations in Docker container
+	docker-compose exec app poetry run alembic upgrade head
+
+docker-migrate-create: ## Create a new migration in Docker container (usage: make docker-migrate-create name=migration_name)
+	docker-compose exec app poetry run alembic revision --autogenerate -m "$(name)"
+
+docker-test: ## Run tests in Docker container
+	docker-compose exec app poetry run pytest
+
+docker-lint: ## Run linting in Docker container
+	docker-compose exec app poetry run ruff check .
+
+# Database Commands
 migrate: ## Run database migrations
 	poetry run alembic upgrade head
 
 migrate-create: ## Create a new migration (usage: make migrate-create name=migration_name)
 	poetry run alembic revision --autogenerate -m "$(name)"
+
+db-init: ## Initialize database (create tables)
+	poetry run python -c "from app.db.base import init_db; import asyncio; asyncio.run(init_db())"
+
+docker-db-init: ## Initialize database in Docker container
+	docker-compose exec app poetry run python -c "from app.db.base import init_db; import asyncio; asyncio.run(init_db())"
+
+docs: ## Build documentation
+	poetry run mkdocs build
+
+serve-docs: ## Serve documentation locally
+	poetry run mkdocs serve
 
 upgrade-deps: ## Upgrade all dependencies
 	poetry update
